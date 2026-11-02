@@ -6,7 +6,7 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.3.0 <4.0.0"
+  sdk: '>=3.10.0 <4.0.0'
 
 dependencies:
   flutter:
@@ -24,6 +24,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  http: ^1.6.0
 
   # Pengujian HTTP tanpa request API sungguhan
   # MockClient tersedia melalui package http
