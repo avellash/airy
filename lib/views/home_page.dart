@@ -1,8 +1,10 @@
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../viewmodels/air_quality_viewmodel.dart';
 
+import 'history_page.dart';
 import 'widgets/city_selector.dart';
 import 'widgets/aqi_card.dart';
 import 'widgets/pollutant_card.dart';
@@ -21,17 +23,23 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
-    // Memuat data kualitas udara saat homepage pertama kali dibuka.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-
       context.read<AirQualityViewModel>().loadAirQuality();
     });
   }
 
-  // Memperbarui data kualitas udara.
   Future<void> _refreshData() async {
     await context.read<AirQualityViewModel>().refreshAirQuality();
+  }
+
+  void _openHistory() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const HistoryPage(),
+      ),
+    );
   }
 
   @override
@@ -49,7 +57,6 @@ class _HomePageState extends State<HomePage> {
 
         return Scaffold(
           backgroundColor: const Color(0xFFF8F6FF),
-
           body: SafeArea(
             child: RefreshIndicator(
               onRefresh: _refreshData,
@@ -57,7 +64,6 @@ class _HomePageState extends State<HomePage> {
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.fromLTRB(20, 18, 20, 30),
-
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -88,16 +94,21 @@ class _HomePageState extends State<HomePage> {
                           ],
                         ),
 
-                        Container(
-                          padding: const EdgeInsets.all(11),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFEDE7FA),
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          child: const Icon(
-                            Icons.air_rounded,
-                            size: 27,
-                            color: Color(0xFF9277D8),
+                        // TOMBOL RIWAYAT
+                        InkWell(
+                          onTap: _openHistory,
+                          borderRadius: BorderRadius.circular(15),
+                          child: Container(
+                            padding: const EdgeInsets.all(11),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFEDE7FA),
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: const Icon(
+                              Icons.history_rounded,
+                              size: 27,
+                              color: Color(0xFF9277D8),
+                            ),
                           ),
                         ),
                       ],
@@ -162,7 +173,6 @@ class _HomePageState extends State<HomePage> {
 
                     // DATA KUALITAS UDARA
                     if (current != null) ...[
-                      // STATUS KUALITAS UDARA
                       const Text(
                         'Kondisi Saat Ini',
                         style: TextStyle(
@@ -174,7 +184,7 @@ class _HomePageState extends State<HomePage> {
 
                       const SizedBox(height: 12),
 
-                      // Jika AQI null, jangan menganggapnya sebagai 0.
+                      // STATUS KUALITAS UDARA
                       if (current.usAqi != null)
                         AirQualityStatusWidget(
                           aqi: current.usAqi!,
@@ -192,7 +202,7 @@ class _HomePageState extends State<HomePage> {
 
                       const SizedBox(height: 22),
 
-                      // POLUTAN
+                      // DETAIL POLUTAN
                       const Text(
                         'Detail Polutan',
                         style: TextStyle(
@@ -239,7 +249,7 @@ class _HomePageState extends State<HomePage> {
                       const SizedBox(height: 20),
                     ],
 
-                    // LOADING KECIL SAAT MEMPERBARUI DATA
+                    // LOADING SAAT MEMPERBARUI DATA
                     if (isLoading && current != null)
                       const Padding(
                         padding: EdgeInsets.only(bottom: 12),
@@ -249,7 +259,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
 
-                    // PESAN ERROR JIKA DATA LAMA MASIH DITAMPILKAN
+                    // ERROR SAAT DATA LAMA MASIH DITAMPILKAN
                     if (hasError && current != null)
                       _buildErrorMessage(
                         viewModel.errorMessage ??
