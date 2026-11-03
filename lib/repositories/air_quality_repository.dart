@@ -2,6 +2,7 @@
 import '../models/air_quality_model.dart';
 import '../models/air_quality_forecast_model.dart';
 import '../models/city_model.dart';
+
 import '../services/open_meteo_service.dart';
 import '../services/database_service.dart';
 
@@ -16,7 +17,6 @@ class AirQualityRepository {
       databaseService ?? DatabaseService.instance;
 
   // Mengambil data kualitas udara saat ini.
-  // Data otomatis disimpan ke SQLite.
   Future<AirQualityModel> getCurrentAirQuality(
       CityModel city,
       ) async {
@@ -42,7 +42,7 @@ class AirQualityRepository {
     return airQuality;
   }
 
-  // Mengambil perkiraan kualitas udara per jam.
+  // Mengambil data perkiraan kualitas udara.
   Future<AirQualityForecastModel> getAirQualityForecast(
       CityModel city,
       ) async {
@@ -57,8 +57,7 @@ class AirQualityRepository {
     return AirQualityForecastModel.fromJson(data);
   }
 
-  // Mengambil data saat ini dan forecast dalam satu request.
-  // Data saat ini otomatis disimpan ke SQLite.
+  // Mengambil data saat ini sekaligus perkiraan.
   Future<AirQualityData> getCompleteAirQuality(
       CityModel city,
       ) async {
@@ -76,9 +75,7 @@ class AirQualityRepository {
     final current =
     AirQualityModel.fromJson(currentData);
 
-    final forecast =
-    AirQualityForecastModel.fromJson(data);
-
+    // Simpan data terbaru ke database lokal.
     await databaseService.saveAirQuality(
       city.name,
       current,
@@ -86,11 +83,11 @@ class AirQualityRepository {
 
     return AirQualityData(
       current: current,
-      forecast: forecast,
+      forecast: AirQualityForecastModel.fromJson(data),
     );
   }
 
-  // Mengambil riwayat kualitas udara.
+  // Mengambil riwayat dari database.
   Future<List<Map<String, dynamic>>> getHistory({
     String? cityName,
   }) {
@@ -100,17 +97,16 @@ class AirQualityRepository {
   }
 
   // Menghapus satu riwayat.
-  Future<void> deleteHistory(int id) async {
-    await databaseService.deleteHistory(id);
+  Future<int> deleteHistory(int id) {
+    return databaseService.deleteHistory(id);
   }
 
   // Menghapus seluruh riwayat.
-  Future<void> clearHistory() async {
-    await databaseService.clearHistory();
+  Future<int> clearHistory() {
+    return databaseService.clearHistory();
   }
 }
 
-// Menggabungkan data saat ini dan perkiraan.
 class AirQualityData {
   final AirQualityModel current;
   final AirQualityForecastModel forecast;

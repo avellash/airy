@@ -11,17 +11,19 @@ class DatabaseService {
 
   DatabaseService._init();
 
-  // Membuka database atau membuatnya jika belum tersedia.
+  // Membuka database.
   Future<Database> get database async {
-    if (_database != null) return _database!;
+    if (_database != null) {
+      return _database!;
+    }
 
     _database = await _initDB('airy.db');
     return _database!;
   }
 
+  // Membuat lokasi dan file database.
   Future<Database> _initDB(String fileName) async {
-    final dbPath = await getDatabasesPath();
-    final path = join(dbPath, fileName);
+    final path = join(await getDatabasesPath(), fileName);
 
     return await openDatabase(
       path,
@@ -30,7 +32,7 @@ class DatabaseService {
     );
   }
 
-  // Membuat tabel riwayat kualitas udara.
+  // Membuat tabel untuk menyimpan riwayat kualitas udara.
   Future<void> _createDB(Database db, int version) async {
     await db.execute('''
       CREATE TABLE air_quality_history (
@@ -66,7 +68,7 @@ class DatabaseService {
     );
   }
 
-  // Mengambil seluruh riwayat kualitas udara.
+  // Mengambil seluruh riwayat atau berdasarkan kota.
   Future<List<Map<String, dynamic>>> getHistory({
     String? cityName,
   }) async {
