@@ -16,7 +16,7 @@ Airy adalah aplikasi pemantauan kualitas udara yang membantu pengguna mengetahui
 ## Screenshot Aplikasi
 
 ### Halaman Utama
-![Halaman Utama Airy](screenshots/airy_hompage.png)
+![Halaman Utama Airy](./screenshots/airy_homepage.png)
 
 ## Cara Menjalankan Project
 
